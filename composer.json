@@ -1,0 +1,21 @@
+{
+    "name": "sinevia/php-library-serverless",
+    "description": "PHP Library Serverless",
+    "type": "library",
+    "keywords": ["serverless", "library", "php", "sinevia"],    
+    "homepage": "http://github.com/sinevia/php-library-serverless",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Milan Lesichkov",
+            "email": "lesichkovm@gmail.com",
+            "homepage": "http://lesichkov.co.uk",
+            "role": "Lead Developer"
+        }
+    ],
+    "autoload": {
+        "files": [
+            "src/Serverless.php"
+        ]
+    }
+}
