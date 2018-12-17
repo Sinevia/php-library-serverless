@@ -3,7 +3,8 @@
 namespace Sinevia;
 
 class Serverless {
-  public static function openwhisk(array $args) {
+
+    public static function openwhisk(array $args) {
         /* 1. Set temporary variables */
         $method = $args["__ow_method"] ?? "get";
         $path = $args["__ow_path"] ?? "get";
@@ -24,7 +25,7 @@ class Serverless {
         }
 
         /* 3. Set the $_REQUEST global PHP variable */
-        $_REQUEST = $args; 
+        $_REQUEST = $args;
 
         /* 4. Set the $_SERVER global PHP variable */
         $_SERVER = [];
@@ -41,4 +42,5 @@ class Serverless {
         $_SERVER['REQUEST_METHOD'] = $method;
         $_SERVER['HTTPS'] = $_SERVER['HTTP_X_FORWARDED_PORT'] == "443" ? "on" : "off";
     }
+
 }
