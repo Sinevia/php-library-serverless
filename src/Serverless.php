@@ -47,5 +47,10 @@ class Serverless {
         $_SERVER['REQUEST_METHOD'] = $method;
         $_SERVER['HTTPS'] = $_SERVER['HTTP_X_FORWARDED_PORT'] == "443" ? "on" : "off";
     }
+    
+    public static function openshiftEnv($key, $default = "") {
+        $env = json_decode($_ENV['WHISK_INPUT'], true);
+        return $env[$key] ?? $default;
+    }
 
 }
