@@ -5,15 +5,20 @@ namespace Sinevia;
 class Serverless {
 
     public static function openwhisk(array $args) {
-        /* 1. Set temporary variables */
+        /* 1. Is it openwhisk? No => return */
+        if (isset($args["__ow_method"]) == false) {
+            return;
+        }
+
+        /* 2. Set temporary variables */
         $method = $args["__ow_method"] ?? "get";
-        $path = $args["__ow_path"] ?? "get";
+        $path = $args["__ow_path"] ?? "";
         $header = $args["__ow_headers"] ?? [];
         $ips = $header['x-forwarded-for'] ?? "";
         $ips = explode(', ', $ips);
         $ip = array_shift($ips);
 
-        /* 2. Remove non-regular variables */
+        /* 3. Remove non-regular variables */
         if (isset($args["__ow_method"])) {
             unset($args["__ow_method"]);
         }
@@ -24,10 +29,10 @@ class Serverless {
             unset($args["__ow_headers"]);
         }
 
-        /* 3. Set the $_REQUEST global PHP variable */
+        /* 4. Set the $_REQUEST global PHP variable */
         $_REQUEST = $args;
 
-        /* 4. Set the $_SERVER global PHP variable */
+        /* 5. Set the $_SERVER global PHP variable */
         $_SERVER = [];
         $_SERVER['HTTP_X_FORWARDED_FOR'] = $ip;
         $_SERVER['HTTP_USER_AGENT'] = $header['user-agent'] ?? "";
