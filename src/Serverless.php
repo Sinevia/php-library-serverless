@@ -11,10 +11,10 @@ class Serverless {
         }
 
         /* 2. Set temporary variables */
-        $method = $args["__ow_method"] ?? "get";
-        $path = $args["__ow_path"] ?? "";
+        $method = trim(strtoupper($args["__ow_method"] ?? "GET"));
+        $path = trim($args["__ow_path"] ?? "");
         $header = $args["__ow_headers"] ?? [];
-        $ips = $header['x-forwarded-for'] ?? "";
+        $ips = trim($header['x-forwarded-for'] ?? "");
         $ips = explode(', ', $ips);
         $ip = array_shift($ips);
 
