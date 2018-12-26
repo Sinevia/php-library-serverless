@@ -47,10 +47,72 @@ class Serverless {
         $_SERVER['REQUEST_METHOD'] = $method;
         $_SERVER['HTTPS'] = $_SERVER['HTTP_X_FORWARDED_PORT'] == "443" ? "on" : "off";
     }
-    
-    public static function openshiftEnv($key, $default = "") {
-        $env = json_decode($_ENV['WHISK_INPUT'], true);
-        return $env[$key] ?? $default;
+
+    private static $sessionId = null;
+    private static $sessionData = [];
+
+    public static function sessionStart() {
+        /* 1. Delete expired sessions */
+        \App\Plugins\Session::tableSession()
+                ->where('ExpiresAt', '<', date('Y-m-d H:i:s'))
+                ->delete();
+
+        // 2. If not set yet, set a new one
+        if (is_null(self::$sessionId)) {
+            $sessionId = trim($_REQUEST['slsid'] ?? uniqid());
+            self::$sessionId = $sessionId;
+        }
+
+        // 2. If existing session, pick it up from request
+        $existingSession = trim($_REQUEST['slsid'] ?? "");
+
+        if ($existingSession == "") {
+            return true;
+        }
+
+        self::$sessionId = $existingSession;
+
+        /* 2. Get the session from the database */
+        $session = \App\Plugins\Session::findSessionByKeyAndToken(self::$sessionId,self::sessionToken());
+
+        if (is_null($session)) {
+            return;
+        }
+
+        /* 3. Decode values */
+        $sessionData = json_decode($session['Value'], true);
+
+        if (is_array($sessionData)) {
+            self::$sessionData = $sessionData;
+        }
+        
+        return true;
+    }
+
+    public static function sessionId() {
+        return self::$sessionId;
+    }
+
+    public static function sessionToken() {
+        $t1 = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '';
+        $t2 = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        $t3 = $_SERVER['HTTP_ACCEPT'] ?? '';
+        $t4 = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '';
+        $t5 = $_SERVER['HTTP_ACCEPT_ENCODING'] ?? '';
+        $t6 = $_SERVER['HTTP_ACCEPT_CHARSET'] ?? '';
+
+        $token = $t1 . '_' . $t2 . '_' . $t3 . '_' . $t4 . '_' . $t5 . '_' . $t6;
+        return $token;
+    }
+
+    public static function sessionGet($key, $default = null) {
+        return self::$sessionData[$key] ?? $default;
+    }
+
+    public static function sessionSet(string $key, string $value) {
+        self::$sessionData[$key] = $value;
+        $token = self::sessionToken();
+        return \App\Plugins\Session::createOrUpdateSession(self::$sessionId, self::$sessionData, $token, '+1 hour');
     }
 
 }
