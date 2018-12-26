@@ -4,11 +4,15 @@ Library to help with serverless function development
 
 ## Openwhisk ##
 
-Sinevia\Serverless::openwhisk($args);
+Sets the $_REQUEST and $_SERVER global variables from the arguments passed to the function.
+
+```php
+\Sinevia\Serverless::openwhisk($args);
+```
 
 ## Session ##
 
-When working with sessions the Sessions plugin must be used. The sessions are saved in the database.
+Serverlsess does not support session out of the box. To replicate this functionality the following may be used together with the Sessions plugin which will save the the sessions in the database.
 
 1. Initiate session
 
