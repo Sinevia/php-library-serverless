@@ -2,13 +2,16 @@
 
 namespace Sinevia;
 
-class Serverless {
+class Serverless {    
+    public static $isOpenwhisk = false;
 
     public static function openwhisk(array $args) {
         /* 1. Is it openwhisk? No => return */
         if (isset($args["__ow_method"]) == false) {
             return;
         }
+        
+        self::$isOpenwhisk = true;
 
         /* 2. Set temporary variables */
         $method = trim(strtoupper($args["__ow_method"] ?? "GET"));
