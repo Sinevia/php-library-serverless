@@ -2,7 +2,7 @@
 
 namespace Sinevia;
 
-class Serverless {    
+class Serverless {
     public static $isOpenwhisk = false;
 
     public static function openwhisk(array $args) {
@@ -17,7 +17,7 @@ class Serverless {
         $method = trim(strtoupper($args["__ow_method"] ?? "GET"));
         $path = trim($args["__ow_path"] ?? "");
         $header = $args["__ow_headers"] ?? [];
-        $ips = trim($header['x-forwarded-for'] ?? "");
+        $ips = trim($header['x-forwarded-for'] ?? ""); // May be multiple IPs chained
         $ips = explode(', ', $ips);
         $ip = array_shift($ips);
 
@@ -37,18 +37,33 @@ class Serverless {
 
         /* 5. Set the $_SERVER global PHP variable */
         $_SERVER = [];
-        $_SERVER['HTTP_X_FORWARDED_FOR'] = $ip;
-        $_SERVER['HTTP_USER_AGENT'] = $header['user-agent'] ?? "";
-        $_SERVER['HTTP_X_FORWARDED_PROTO'] = $header['x-forwarded-proto'] ?? "";
-        $_SERVER['HTTP_X_FORWARDED_PORT'] = $header['x-forwarded-port'] ?? "";
         $_SERVER['HTTP_ACCEPT'] = $header['accept'] ?? "";
         $_SERVER['HTTP_ACCEPT_LANGUAGE'] = $header['accept-language'] ?? "";
         $_SERVER['HTTP_ACCEPT_ENCODING'] = $header['accept-encoding'] ?? "";
         $_SERVER['HTTP_ACCEPT_CHARSET'] = $header['accept-charset'] ?? "";
-        $_SERVER['HTTP_REFERRER'] = $header['referer'] ?? "";
+        $_SERVER['HTTP_HOST'] = $header['host'] ?? ""; // "openwhisk.eu-gb.bluemix.net",
+        $_SERVER['HTTP_REFERRER'] = $header['referer'] ?? "";        
+        $_SERVER['HTTP_USER_AGENT'] = $header['user-agent'] ?? "";
+        $_SERVER['HTTP_X_FORWARDED_FOR'] = $ip;
+        $_SERVER['HTTP_X_FORWARDED_HOST'] = $header['x-forwarded-host'] ?? ""; // openwhisk.eu-gb.bluemix.net
+        $_SERVER['HTTP_X_FORWARDED_PROTO'] = $header['x-forwarded-proto'] ?? ""; // "https"
+        $_SERVER['HTTP_X_FORWARDED_PORT'] = $header['x-forwarded-port'] ?? ""; // "443"
+        $_SERVER['HTTP_X_FORWARDED_SERVER'] = $header['x-forwarded-server'] ?? ""; // proxy server
+        $_SERVER['HTTPS'] = $_SERVER['HTTP_X_FORWARDED_PORT'] == "443" ? "on" : "off";
         $_SERVER['REQUEST_URI'] = $path;
         $_SERVER['REQUEST_METHOD'] = $method;
-        $_SERVER['HTTPS'] = $_SERVER['HTTP_X_FORWARDED_PORT'] == "443" ? "on" : "off";
+        
+        /* Non standard headers */
+        $_SERVER['CACHE_CONTROL'] = $header['cache-control'] ?? "";
+        $_SERVER['CDN_LOOP'] = $header['cdn-loop'] ?? "";
+        $_SERVER['CF_CONNECTING_IP'] = $header['cf-connecting-ip'] ?? ""; // proxy ip
+        $_SERVER['CF_IPCOUNTRY'] = $header['cf-ipcountry'] ?? ""; // i.e. GB
+        $_SERVER['CF_RAY'] = $header['cf-ray'] ?? "";
+        $_SERVER['CF_VISITOR'] = $header['cf-visitor'] ?? ""; // "{\"scheme\":\"https\"}"
+        $_SERVER['HTTP_COOKIE'] = $header['cookie'] ?? "";
+        $_SERVER['HTTP_IP_CHAIN'] = $ips; // All IPs in the request chain        
+        $_SERVER['OWHISK_HTTP_REFERRER'] = $header['upgrade-insecure-requests'] ?? ""; // 0 or 1
+        $_SERVER['OWHISK_X_REAL_IP'] = $header['x-real-ip'] ?? ""; // ip of the OpenWhisk machine
     }
 
     private static $sessionId = null;
