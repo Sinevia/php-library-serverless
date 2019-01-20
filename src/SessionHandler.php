@@ -1,4 +1,7 @@
 <?php
+
+namespace Sinevia;
+
 class SessionHandler implements SessionHandlerInterface, SessionUpdateTimestampHandlerInterface {
     public function close(){
         return true;
