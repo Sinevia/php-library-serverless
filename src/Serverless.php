@@ -33,7 +33,7 @@ class Serverless {
         }
 
         /* 4. Set the $_REQUEST global PHP variable */
-        $_REQUEST = $args;
+        parse_str(http_build_query($args), $_REQUEST); // reparsed to correctly represent multidimensional requests items
 
         /* 5. Set the $_SERVER global PHP variable */
         $_SERVER = [];
