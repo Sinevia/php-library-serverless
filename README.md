@@ -2,6 +2,8 @@
 
 Library to help with serverless function development
 
+![No Dependencies](https://img.shields.io/badge/no-dependencies-success.svg)
+
 ## Openwhisk ##
 
 Sets the $_REQUEST and $_SERVER global variables from the arguments passed to the function.
