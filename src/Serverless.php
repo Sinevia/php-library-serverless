@@ -64,6 +64,7 @@ class Serverless {
         $_SERVER['HTTP_IP_CHAIN'] = $ips; // All IPs in the request chain        
         $_SERVER['OWHISK_HTTP_REFERRER'] = $header['upgrade-insecure-requests'] ?? ""; // 0 or 1
         $_SERVER['OWHISK_X_REAL_IP'] = $header['x-real-ip'] ?? ""; // ip of the OpenWhisk machine
+        $_SERVER['OWHISK_HEADERS'] = json_encode($header);
     }
 
     private static $sessionId = null;
