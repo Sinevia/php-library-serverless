@@ -65,8 +65,11 @@ class Serverless {
         $_SERVER['OWHISK_HTTP_REFERRER'] = $header['upgrade-insecure-requests'] ?? ""; // 0 or 1
         $_SERVER['OWHISK_X_REAL_IP'] = $header['x-real-ip'] ?? ""; // ip of the OpenWhisk machine
         $_SERVER['OWHISK_HEADERS'] = json_encode($header);
-        $_SERVER['API_HOST'] = $_ENV['__OW_API_HOST'] ?? '';
-        $_SERVER['ACTION_NAME'] = $_ENV['__OW_ACTION_NAME'] ?? '';
+        $_SERVER['OWHISK_API_HOST'] = $_ENV['__OW_API_HOST'] ?? '';
+        $_SERVER['OWHISK_ACTION_NAME'] = $_ENV['__OW_ACTION_NAME'] ?? '';
+        
+        /* Calculated */
+        $_SERVER['FUNCTION_NAME'] = basename($_ENV['__OW_ACTION_NAME'] ?? '');
     }
 
     private static $sessionId = null;
