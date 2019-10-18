@@ -10,7 +10,7 @@ class Serverless {
         if (isset($args["__ow_method"]) == false) {
             return;
         }
-        
+
         self::$isOpenwhisk = true;
 
         /* 2. Set temporary variables */
@@ -33,6 +33,7 @@ class Serverless {
         }
 
         /* 4. Set the $_REQUEST global PHP variable */
+        asort($args, SORT_NUMERIC);
         parse_str(http_build_query($args), $_REQUEST); // reparsed to correctly represent multidimensional requests items
 
         /* 5. Set the $_SERVER global PHP variable */
@@ -42,7 +43,7 @@ class Serverless {
         $_SERVER['HTTP_ACCEPT_ENCODING'] = $header['accept-encoding'] ?? "";
         $_SERVER['HTTP_ACCEPT_CHARSET'] = $header['accept-charset'] ?? "";
         $_SERVER['HTTP_HOST'] = $header['host'] ?? ""; // "openwhisk.eu-gb.bluemix.net",
-        $_SERVER['HTTP_REFERRER'] = $header['referer'] ?? "";        
+        $_SERVER['HTTP_REFERRER'] = $header['referer'] ?? "";
         $_SERVER['HTTP_USER_AGENT'] = $header['user-agent'] ?? "";
         $_SERVER['HTTP_X_FORWARDED_FOR'] = $ip;
         $_SERVER['HTTP_X_FORWARDED_HOST'] = $header['x-forwarded-host'] ?? ""; // openwhisk.eu-gb.bluemix.net
@@ -52,7 +53,7 @@ class Serverless {
         $_SERVER['HTTPS'] = $_SERVER['HTTP_X_FORWARDED_PORT'] == "443" ? "on" : "off";
         $_SERVER['REQUEST_URI'] = $path;
         $_SERVER['REQUEST_METHOD'] = $method;
-        
+
         /* Non standard headers */
         $_SERVER['CACHE_CONTROL'] = $header['cache-control'] ?? "";
         $_SERVER['CDN_LOOP'] = $header['cdn-loop'] ?? "";
@@ -61,13 +62,13 @@ class Serverless {
         $_SERVER['CF_RAY'] = $header['cf-ray'] ?? "";
         $_SERVER['CF_VISITOR'] = $header['cf-visitor'] ?? ""; // "{\"scheme\":\"https\"}"
         $_SERVER['HTTP_COOKIE'] = $header['cookie'] ?? "";
-        $_SERVER['HTTP_IP_CHAIN'] = $ips; // All IPs in the request chain        
+        $_SERVER['HTTP_IP_CHAIN'] = $ips; // All IPs in the request chain
         $_SERVER['OWHISK_HTTP_REFERRER'] = $header['upgrade-insecure-requests'] ?? ""; // 0 or 1
         $_SERVER['OWHISK_X_REAL_IP'] = $header['x-real-ip'] ?? ""; // ip of the OpenWhisk machine
         $_SERVER['OWHISK_HEADERS'] = json_encode($header);
         $_SERVER['OWHISK_API_HOST'] = $_ENV['__OW_API_HOST'] ?? '';
         $_SERVER['OWHISK_ACTION_NAME'] = $_ENV['__OW_ACTION_NAME'] ?? '';
-        
+
         /* Calculated */
         $_SERVER['FUNCTION_NAME'] = basename($_ENV['__OW_ACTION_NAME'] ?? '');
     }
@@ -109,7 +110,7 @@ class Serverless {
         if (is_array($sessionData)) {
             self::$sessionData = $sessionData;
         }
-        
+
         return true;
     }
 
