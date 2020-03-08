@@ -10,7 +10,7 @@ class Serverless {
      * @param string $filePath the path to the file
      * @return void
      */
-    function loadFileToRegistry($filePath) {
+    public static function loadFileToRegistry($filePath) {
         if (file_exists($filePath)) {
             $vars = include($filePath);
 
