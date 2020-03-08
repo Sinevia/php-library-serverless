@@ -5,6 +5,27 @@ namespace Sinevia;
 class Serverless {
     public static $isOpenwhisk = false;
 
+    /**
+     * Loads PHP file to registry. The file must be an associative array
+     * @param string $filePath the path to the file
+     * @return void
+     */
+    function loadFileToRegistry($filePath) {
+        if (file_exists($filePath)) {
+            $vars = include($filePath);
+
+            if (is_array($vars)) {
+                foreach ($vars as $key => $value) {
+                    \Sinevia\Registry::set($key, $value);
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static function openwhisk(array $args) {
         /* 1. Is it openwhisk? No => return */
         if (isset($args["__ow_method"]) == false) {
